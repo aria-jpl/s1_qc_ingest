@@ -1,0 +1,28 @@
+{
+  "label" : "Sentinel-1 Orbit Ingest",
+  "allowed_accounts": [ "ops" ],
+  "submission_type":"individual",
+  "params" : [
+    {
+        "name": "version_opt",
+        "from": "value",
+        "value": "--dataset_version"
+    },
+    {
+        "name": "version",
+        "from": "submitter"
+    },
+    {
+        "name": "orbit_url",
+        "from": "submitter"
+    },
+    {
+        "name": "orbit_file",
+        "from": "submitter"
+    },
+    {
+        "name": "es_dataset_url",
+        "from": "submitter"
+    }
+  ]
+}

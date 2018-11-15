@@ -1,0 +1,262 @@
+commit e95d7d81f3c61ec9a042d65c53acc5cd8dbb7e0d
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Mon Sep 24 20:48:05 2018 +0000
+
+    clean up
+
+commit 8b6b8c298ad24dc2bfbe9fa7400ee317c1ddf0d1
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Wed Jun 27 22:13:10 2018 +0000
+
+    increase time limits
+
+commit 58d83ce15d3fa96350c0629750c521a385b1edd6
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Fri Jun 22 19:20:42 2018 +0000
+
+    differentiate soft/hard time limits and set according to expected execution times
+
+commit 9140967cae4eaf2b659e2da484f39f41df42b4a9
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Wed Jun 20 14:23:51 2018 +0000
+
+    update filter for active calibrations
+
+commit c70435a782de97cc2f04b876e058762f36dba814
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Wed Jun 20 14:08:00 2018 +0000
+
+    expose exceptions
+
+commit 01dd4d252b732891266d3f2d17c90458e11b81c0
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Wed Jun 20 00:54:04 2018 +0000
+
+    pass renamed safe tar file
+
+commit 1383fac3bae0283637bdcee96f8088de0ae9b22d
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Wed Jun 20 00:47:26 2018 +0000
+
+    rename cal files
+
+commit 87f8df8d90ca68d5ecdab6314e2736d00795b4ad
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Wed Jun 20 00:25:57 2018 +0000
+
+    add correct suffix
+
+commit 4673731a3edbc0c0ce0b1fd35dd35c9c6672cbcc
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Wed Jun 20 00:10:59 2018 +0000
+
+    update to handle changes to qc urls
+
+commit 3027608c609d6af00a70caae6d6402770daf9acc
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 19 23:41:50 2018 +0000
+
+    handle infrastructure changes
+
+commit 3ede9fdb61a5b9f148e06218ea62968d78fdce21
+Author: jlinick <Justin.P.Linick@jpl.nasa.gov>
+Date:   Tue Jun 12 23:58:28 2018 +0000
+
+    update crawler time limit to 1000 sec
+
+commit 63112c4c478266cb78b8e3516dc43643f92cdbb7
+Author: Mohammed R Karim <mkarim@jpl.nasa.gov>
+Date:   Mon Apr 30 21:48:14 2018 +0000
+
+    added time limit
+
+commit e3820b728b82761db8ff81fc489e50aa27af2af0
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Nov 14 04:21:42 2017 +0000
+
+    link in AWS creds
+
+commit 169ca6460fe07fdf972bed573c78d279a411311f
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Nov 14 04:16:24 2017 +0000
+
+    pull fields
+
+commit ad4d2cd29af77748adc4cb5f7831f03aec0427bc
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Nov 14 04:06:20 2017 +0000
+
+    purge dataset from current dataset entry
+
+commit 9317b742d8e9d08a243347fd2750a0f57253e8ca
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Nov 14 03:09:32 2017 +0000
+
+    add dataset to purge since osaka will bomb on clobber
+
+commit 51ff844ac1b6a5ccc33fa4f5b9dc12396015318c
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Wed Jun 14 17:11:17 2017 +0000
+
+    add README.md
+
+commit 03db31d3cb1bc8a8b15361cdff98d65ea1fcc487
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 18:29:29 2017 +0000
+
+    add ids of active calibration files to met
+
+commit d9c2c4d4dd245b92de671f767b37750bf2cd665e
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 18:12:42 2017 +0000
+
+    add job-spec/hysds-io for S1 calibration file crawler/ingester
+
+commit 943508dd055bc25b0348eec213dec64ef00ddcc3
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 18:04:47 2017 +0000
+
+    remove timestamp
+
+commit fadba9b49927b691ea9838805fa245ef5bbc531e
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 17:57:35 2017 +0000
+
+    update to create S1-AUX_CAL and S1-AUX_CAL_ACTIVE datasets in crawler
+    
+    Ensure active calibrations files can be queried by making it a dataset
+    that gets ingested last.
+
+commit d4ad0e70b04096c26d0d58b99dcad322ba46ff21
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 16:18:53 2017 +0000
+
+    add calibration dataset generation script
+
+commit f747513a48c625ff0ea69f1ab77de5f8a2c51d4f
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 14:37:08 2017 +0000
+
+    add crawler for calibration urls
+
+commit 12d25f9606e64e9380bed3076ba48d6b2e83114e
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 14:25:25 2017 +0000
+
+    use doc string for description
+
+commit 98ddd048fcd2c16be85fb2000ef92bfddfc733be
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 14:22:19 2017 +0000
+
+    fix logger name
+
+commit ab19ae27963343304110824f9214f7f994f7b674
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 14:19:19 2017 +0000
+
+    allow specification of QC file type to crawl (orbit or calibration)
+
+commit b18769a16c2f2175c732bfbbff79e8e30ee5f1b5
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 14:07:45 2017 +0000
+
+    set archive_filename
+
+commit dfc9d6d43a1320e171551ec3eedbe9914458f9e5
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 07:13:49 2017 +0000
+
+    disable dedup for crawler job
+
+commit 20ff39a42a55937a8d56d754e755eeaa262be17d
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 06:55:28 2017 +0000
+
+    fix cut-n-paste bug
+
+commit 5692d5131888ffe70aceaab03528cc4f39af8b80
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 06:39:52 2017 +0000
+
+    submit orbit ingest job to factotum-job_worker-large
+
+commit 07d3fcea011727ad71bb8274b7a3fe902b7673aa
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 06:35:56 2017 +0000
+
+    set page limit on number of pages to go back
+
+commit fec51447e05c70ee0857e361c35cee6ddbf31a92
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:59:16 2017 +0000
+
+    fix bug in iteration stop detection
+
+commit 0cea3e1d6eae79acc39d8f5417f093fbde0316bc
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:43:20 2017 +0000
+
+    ensure dataset id includes version; fix job names
+
+commit f5ffd9c40549dc8a431ace512b3b273f5e586699
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:32:42 2017 +0000
+
+    set correct path to executable
+
+commit b44a459c20734027b8d20a32cb3ddfd84eaed931
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:28:56 2017 +0000
+
+    place recommended-queues in job-specs
+
+commit 634773dd276eacdcacf15c06391394cc47172282
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:23:15 2017 +0000
+
+    set as individual submission type
+
+commit f00405445105fc0c600a09e4f02e8ae589790f93
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 05:09:38 2017 +0000
+
+    add cron script for submitting orbit crawler jobs
+    
+    Propagate tag and dataset version.
+
+commit a7a3f2728e9cf19797c01346f257298a871b065a
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 04:37:01 2017 +0000
+
+    clean up logging
+
+commit 3a9b0d5043814ba4fb27f99453004a002b9a24fb
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 04:34:26 2017 +0000
+
+    submit to factotum-job_worker-small queue
+
+commit 88455e7f48bdc692c5327e43c0eaea0c2f7b5947
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 04:31:50 2017 +0000
+
+    add arg to specify release tag of PGE
+
+commit 872728956b642daa58475b566463ea6bfa7ce13f
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 04:20:46 2017 +0000
+
+    remove deprecated field
+
+commit c0d606b300bd9bfabae82c20ddf5a0642fccf615
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Tue Jun 13 04:14:02 2017 +0000
+
+    initial implementation of crawler and job-spec/hysds-io configs
+
+commit c1c03b8681801c0ef57cd38c0bbcbd749e3bb96c
+Author: gmanipon <gmanipon@jpl.nasa.gov>
+Date:   Mon Jun 12 21:44:33 2017 +0000
+
+    initial commit
