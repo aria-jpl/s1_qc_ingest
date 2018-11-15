@@ -1,9 +1,6 @@
 # s1_qc_ingest
 Sentinel1 Quality Control File Ingest and Crawler
 
-## Release
-- current release: release-20170613
-
 ## Requirements
 - HySDS
 - Osaka
