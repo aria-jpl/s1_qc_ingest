@@ -2,6 +2,7 @@
   "command": "/home/ops/verdi/ops/s1_qc_ingest/crawl_cals.py",
   "imported_worker_files": {
     "/home/ops/.aws": ["/home/ops/.aws", "ro"],
+    "/home/ops/.azure": ["/home/ops/.azure", "ro"],
     "/home/ops/.netrc": "/home/ops/.netrc"
   },
   "recommended-queues" : [ "factotum-job_worker-small" ],
