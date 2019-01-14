@@ -115,7 +115,7 @@ def crawl_cals(dataset_version):
     query = url + '/?adf__active=True'
 
     logger.info(query)
-    
+
     logger.info('Querying for {0} calibration files'.format(oType))
     r = session_get(session, query)
     r.raise_for_status()
@@ -178,7 +178,7 @@ def create_active_cal_ds(active_ids, dataset_version, root_ds_dir="."):
         "dataset": "S1-AUX_CAL_ACTIVE",
         "active_ids": active_ids,
     }
-    logger.info("met: %s" % json.dumps(met, indent=2, sort_keys=True)) 
+    logger.info("met: %s" % json.dumps(met, indent=2, sort_keys=True))
 
     # get dataset json
     ds = {
@@ -238,7 +238,8 @@ def purge_active_cal_ds(es_url, dataset_version):
         if total > 0:
             hit = result['hits']['hits'][0]['fields']
             for url in hit['urls']:
-                if url.startswith('s3://'): rmall(url)
+                if not (url.startswith('http') or url.startswith('ftp')):
+                    rmall(url)
     else:
         logger.error("Failed to query %s:\n%s" % (es_url, r.text))
         logger.error("query: %s" % json.dumps(query, indent=2))
