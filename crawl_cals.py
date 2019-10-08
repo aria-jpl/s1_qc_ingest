@@ -3,12 +3,15 @@
 Crawl calibration files, create and ingest calibration datasets.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import os, sys, re, json, logging, traceback, requests, argparse, backoff, shutil
 from datetime import datetime
 from requests.packages.urllib3.exceptions import (InsecureRequestWarning,
                                                   InsecurePlatformWarning)
 try: from html.parser import HTMLParser
-except: from HTMLParser import HTMLParser
+except: from html.parser import HTMLParser
 
 from osaka.main import get, rmall
 
@@ -194,7 +197,7 @@ def create_active_cal_ds(active_ids, dataset_version, root_ds_dir="."):
     ds_id = id
     root_ds_dir = os.path.abspath(root_ds_dir)
     ds_dir = os.path.join(root_ds_dir, ds_id)
-    if not os.path.isdir(ds_dir): os.makedirs(ds_dir, 0755)
+    if not os.path.isdir(ds_dir): os.makedirs(ds_dir, 0o755)
 
     # dump dataset and met JSON
     ds_file = os.path.join(ds_dir, "%s.dataset.json" % ds_id)
