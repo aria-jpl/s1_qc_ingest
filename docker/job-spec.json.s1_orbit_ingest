@@ -1,5 +1,5 @@
 {
-  "command": "/home/ops/verdi/ops/s1_qc_ingest/create_orbit_ds.py",
+  "command": "python /home/ops/verdi/ops/s1_qc_ingest/create_orbit_ds.py",
   "imported_worker_files": {
     "/home/ops/.aws": ["/home/ops/.aws", "ro"],
     "/home/ops/.netrc": "/home/ops/.netrc"
