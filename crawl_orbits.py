@@ -3,13 +3,16 @@
 Crawl orbits and submit orbit dataset generation jobs.
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import os, sys, re, json, logging, traceback, requests, argparse, backoff
 from datetime import datetime
 from pprint import pformat
 from requests.packages.urllib3.exceptions import (InsecureRequestWarning,
                                                   InsecurePlatformWarning)
 try: from html.parser import HTMLParser
-except: from HTMLParser import HTMLParser
+except: from html.parser import HTMLParser
 
 from hysds_commons.job_utils import submit_mozart_job
 from hysds.celery import app

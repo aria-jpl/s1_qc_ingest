@@ -3,6 +3,7 @@
 Create a HySDS dataset from a Sentinel1 precise or restituted orbit.
 """
 
+from builtins import str
 import os, sys, time, re, json, requests, shutil, logging, traceback, argparse
 from datetime import datetime, timedelta
 
@@ -45,7 +46,7 @@ def create_dataset(ds, met, orbit_file, root_ds_dir="."):
     id = met['data_product_name']
     root_ds_dir = os.path.abspath(root_ds_dir)
     ds_dir = os.path.join(root_ds_dir, id)
-    if not os.path.isdir(ds_dir): os.makedirs(ds_dir, 0755)
+    if not os.path.isdir(ds_dir): os.makedirs(ds_dir, 0o755)
 
     # dump dataset and met JSON
     ds_file = os.path.join(ds_dir, "%s.dataset.json" % id)
