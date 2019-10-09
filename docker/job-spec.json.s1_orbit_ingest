@@ -6,8 +6,8 @@
   },
   "recommended-queues" : [ "factotum-job_worker-large" ],
   "disk_usage":"1GB",
-  "soft_time_limit": 300,
-  "time_limit": 600,
+  "soft_time_limit": 600,
+  "time_limit": 900,
   "params" : [
     {
         "name": "version_opt",
