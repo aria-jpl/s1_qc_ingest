@@ -1,8 +1,8 @@
 {
   "command": "python /home/ops/verdi/ops/s1_qc_ingest/create_orbit_ds.py",
   "imported_worker_files": {
-    "/home/ops/.aws": ["/home/ops/.aws", "ro"],
-    "/home/ops/.netrc": "/home/ops/.netrc"
+    "/export/home/hysdsops/.aws": ["/home/ops/.aws", "ro"],
+    "/export/home/hysdsops/.netrc": "/home/ops/.netrc"
   },
   "recommended-queues" : [ "factotum-job_worker-large" ],
   "disk_usage":"1GB",
