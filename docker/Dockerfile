@@ -1,4 +1,4 @@
-FROM hysds/pge-base:latest
+FROM hysds/pge-base:develop-es1
 
 MAINTAINER aria-dev "aria-dev@jpl.nasa.gov"
 LABEL description="Sentinel1 orbit crawler/ingester PGE"
