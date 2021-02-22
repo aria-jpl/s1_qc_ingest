@@ -122,7 +122,7 @@ def check_orbit(es_url, es_index, id):
                 ]
             }
         },
-        "fields": [],
+        "_source": [],
     }
 
     if es_url.endswith('/'):
@@ -130,7 +130,9 @@ def check_orbit(es_url, es_index, id):
     else:
         search_url = '%s/%s/_search' % (es_url, es_index)
     #logger.info("search_url: %s" % search_url)
-    r = requests.post(search_url, data=json.dumps(query))
+    #r = requests.post(search_url, data=json.dumps(query))
+    headers = {'Content-type': 'application/json'}
+    r = requests.post(search_url, data=json.dumps(query), headers=headers, verify=False)
     if r.status_code == 200:
         result = r.json()
         #logger.info(pformat(result))
@@ -204,6 +206,14 @@ def crawl_orbits(dataset_version):
     logger.info(len(results))
 
 
+def parse_job_tags(tag_string):
+    if tag_string == None or tag_string == '':
+        return ''
+    tag_list = tag_string.split(',')
+    tag_list = ['"{0}"'.format(tag) for tag in tag_list]
+    return ','.join(tag_list)
+
+
 def submit_job(id, url, ds_es_url, tag, dataset_version):
     """Submit job for orbit dataset generation."""
 
@@ -245,12 +255,20 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
             "value": ds_es_url,
         }
     ]
+    tag = '[{0}]'.format(parse_job_tags(tag))
     print("submitting orbit ingest job for %s" % id)
-    submit_mozart_job({}, rule,
-        hysdsio={"id": "internal-temporary-wiring",
-                 "params": params,
-                 "job-specification": job_spec},
-        job_name=job_name)
+    params = {
+            'queue': 'factotum-job_worker-small',
+            'priority': '3',
+            'tags': tag,
+            'type': job_spec,
+            'params': param,
+            'enable_dedup': False
+    }
+    logger.info("These are the params")
+    logger.info(params)
+    job_submit_url = os.path.join(app.conf['MOZART_URL'], 'api/v0.2/job/submit')
+    r = requests.post(job_submit_url, params=params, verify=False)
 
 
 def crawl(ds_es_url, dataset_version, tag):
@@ -258,7 +276,7 @@ def crawl(ds_es_url, dataset_version, tag):
 
     for id, url in crawl_orbits(dataset_version):
         #logger.info("%s: %s" % (id, url))
-        total, found_id = check_orbit(ds_es_url, "grq", id)
+        total, found_id = check_orbit(ds_es_url, "grq_es/grq_v1.1_s1-aux_poeorb", id)
         if total > 0:
             logger.info("Found %s." % id)
             #prods_found.append(acq_id)
