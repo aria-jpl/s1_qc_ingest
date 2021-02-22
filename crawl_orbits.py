@@ -114,16 +114,7 @@ def session_get(session, url):
 def check_orbit(es_url, es_index, id):
     """Query for orbits with specified input ID."""
 
-    query = {
-        "query":{
-            "bool":{
-                "must": [
-                    { "term": { "_id": id } },
-                ]
-            }
-        },
-        "_source": [],
-    }
+    query = {"query":{"bool":{"must":[{"term":{"_id":id}}]}}}
 
     if es_url.endswith('/'):
         search_url = '%s%s/_search' % (es_url, es_index)
