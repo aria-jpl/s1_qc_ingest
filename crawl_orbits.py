@@ -136,7 +136,7 @@ def check_orbit(es_url, es_index, id):
     if r.status_code == 200:
         result = r.json()
         #logger.info(pformat(result))
-        total = result['hits']['total']
+        total = result['hits']['total']['value']
         id = 'NONE' if total == 0 else result['hits']['hits'][0]['_id']
     else:
         logger.error("Failed to query %s:\n%s" % (es_url, r.text))
@@ -228,7 +228,7 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
         "priority": 0,
         "kwargs":'{}'
     }
-    params = [
+    param = [
         {   
             "name": "version_opt",
             "from": "value",
