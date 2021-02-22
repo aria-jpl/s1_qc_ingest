@@ -228,6 +228,7 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
         "priority": 0,
         "kwargs":'{}'
     }
+    '''
     param = [
         {   
             "name": "version_opt",
@@ -255,6 +256,8 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
             "value": ds_es_url,
         }
     ]
+    '''
+    param = '{"version_opt": "%s", "version": "%s", "orbit_url": "%s", "orbit_file": "%s", "es_dataset_url": "%s"}' % ("--dataset_version", dataset_version, url, os.path.basename(url), ds_es_url)
     tag = '[{0}]'.format(parse_job_tags(tag))
     print("submitting orbit ingest job for %s" % id)
     params = {
