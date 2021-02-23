@@ -35,27 +35,19 @@ PLATFORM_RE = re.compile(r'S1(.+?)_')
 def check_cal(es_url, es_index, id):
     """Query for calibration file with specified input ID."""
 
-    query = {
-        "query":{
-            "bool":{
-                "must": [
-                    { "term": { "_id": id } },
-                ]
-            }
-        },
-        "fields": [],
-    }
+    query = {"query":{"bool":{"must":[{"term":{"_id":id}}]}}}
 
     if es_url.endswith('/'):
         search_url = '%s%s/_search' % (es_url, es_index)
     else:
         search_url = '%s/%s/_search' % (es_url, es_index)
     #logger.info("search_url: %s" % search_url)
-    r = requests.post(search_url, data=json.dumps(query))
+    headers = {'Content-type': 'application/json'}
+    r = requests.post(search_url, data=json.dumps(query), headers=headers, verify=False)
     if r.status_code == 200:
         result = r.json()
         #logger.info(pformat(result))
-        total = result['hits']['total']
+        total = result['hits']['total']['value']
         id = 'NONE' if total == 0 else result['hits']['hits'][0]['_id']
     else:
         logger.error("Failed to query %s:\n%s" % (es_url, r.text))
