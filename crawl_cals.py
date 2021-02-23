@@ -258,7 +258,7 @@ def crawl(ds_es_url, dataset_version, tag):
     for id, url in crawl_cals(dataset_version):
         #logger.info("%s: %s" % (id, url))
         active_ids.append(id)
-        total, found_id = check_cal(ds_es_url, "grq", id)
+        total, found_id = check_cal(ds_es_url, "grq_es/grq_v1.1_s1-aux_cal", id)
         if total > 0:
             logger.info("Found %s." % id)
         else:
