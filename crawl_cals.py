@@ -233,11 +233,12 @@ def purge_active_cal_ds(es_url, dataset_version):
     else:
         search_url = '%s/%s/_search' % (es_url, es_index)
     #logger.info("search_url: %s" % search_url)
-    r = requests.post(search_url, data=json.dumps(query))
+    headers = {'Content-type': 'application/json'}
+    r = requests.post(search_url, data=json.dumps(query), headers=headers, verify=False)
     if r.status_code == 200:
         result = r.json()
         #logger.info(pformat(result))
-        total = result['hits']['total']
+        total = result['hits']['total']['value']
         if total > 0:
             hit = result['hits']['hits'][0]['fields']
             for url in hit['urls']:
