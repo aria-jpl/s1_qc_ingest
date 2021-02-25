@@ -227,7 +227,7 @@ def purge_active_cal_ds(es_url, dataset_version):
         },
         "fields": [ "urls" ],
     }
-    es_index = "grq_%s_s1-aux_cal_active" % dataset_version
+    es_index = "grq_es/grq_%s_s1-aux_cal_active" % dataset_version
     if es_url.endswith('/'):
         search_url = '%s%s/_search' % (es_url, es_index)
     else:
