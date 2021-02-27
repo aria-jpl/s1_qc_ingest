@@ -120,7 +120,7 @@ def create_orbit_ds(orbit_file, ds_es_url, version="v1.1"):
     logger.info("dataset: %s" % json.dumps(ds, indent=2, sort_keys=True))
 
     # dedup dataset
-    total, found_id = check_orbit(ds_es_url, "grq", id)
+    total, found_id = check_orbit(ds_es_url, "grq_es", id)
     logger.info("total, found_id: %s %s" % (total, found_id))
     if total > 0:
         logger.info("Found %s in %s. Dedupping dataset." % (id, ds_es_url))
