@@ -41,8 +41,11 @@ logger.addFilter(LogFilter())
 QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 
-ORBITMAP = [('precise','aux_poeorb', 100),
-            ('restituted','aux_resorb', 100)]
+#ORBITMAP = [('precise','aux_poeorb', 100),
+#           ('restituted','aux_resorb', 100)]
+
+ORBITMAP = [('precise','POEORB', 100),
+            ('restituted','RESORB', 100)]
 
 OPER_RE = re.compile(r'S1\w_OPER_AUX_(?P<type>\w+)_OPOD_(?P<yr>\d{4})(?P<mo>\d{2})(?P<dy>\d{2})')
 
