@@ -37,7 +37,8 @@ logger.setLevel(logging.INFO)
 logger.addFilter(LogFilter())
 
 
-QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+#QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 
 ORBITMAP = [('precise','aux_poeorb', 100),
