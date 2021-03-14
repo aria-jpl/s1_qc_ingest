@@ -41,9 +41,6 @@ logger.addFilter(LogFilter())
 QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 
-#ORBITMAP = [('precise','aux_poeorb', 100),
-#           ('restituted','aux_resorb', 100)]
-
 ORBITMAP = [('precise','POEORB', 100),
             ('restituted','RESORB', 100)]
 
