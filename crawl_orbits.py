@@ -144,7 +144,7 @@ def check_orbit(es_url, es_index, id):
 def crawl_orbits(dataset_version, days_back):
     """Crawl for orbit urls."""
     date_today = datetime.now()
-    date_delta = timedelta(days = days_back)
+    date_delta = timedelta(days = int(days_back))
     start_date = date_today - date_delta
 
     results = {}
@@ -179,7 +179,7 @@ def crawl_orbits(dataset_version, days_back):
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
                 yield id, results[id]
 
             # page through and get more results
@@ -201,7 +201,7 @@ def crawl_orbits(dataset_version, days_back):
                         match = OPER_RE.search(res)
                         if not match:
                             raise RuntimeError("Failed to parse orbit: {}".format(res))
-                        results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                        results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
                         yield id, results[id]
                 if reached_end: break
                 else: page += 1
@@ -286,7 +286,7 @@ def crawl(ds_es_url, dataset_version, tag, days_back):
 
     for id, url in crawl_orbits(dataset_version, days_back):
         #logger.info("%s: %s" % (id, url))
-        total, found_id = check_orbit(ds_es_url, "grq_es/grq_v1.1_s1-aux_poeorb", id)
+        total, found_id = check_orbit(ds_es_url, "grq_es", id)
         if total > 0:
             logger.info("Found %s." % id)
             #prods_found.append(acq_id)
