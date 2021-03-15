@@ -143,8 +143,9 @@ def check_orbit(es_url, es_index, id):
 
 def crawl_orbits(dataset_version, days_back):
     """Crawl for orbit urls."""
+    days_back = int(days_back)
     date_today = datetime.now()
-    date_delta = timedelta(days = int(days_back))
+    date_delta = timedelta(days = days_back)
     start_date = date_today - date_delta
 
     results = {}
