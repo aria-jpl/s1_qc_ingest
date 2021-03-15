@@ -7,7 +7,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 import os, sys, re, json, logging, traceback, requests, argparse, backoff
-from datetime import datetime
+from datetime import datetime, timedelta
 from pprint import pformat
 from requests.packages.urllib3.exceptions import (InsecureRequestWarning,
                                                   InsecurePlatformWarning)
@@ -37,11 +37,12 @@ logger.setLevel(logging.INFO)
 logger.addFilter(LogFilter())
 
 
-QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+#QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 
-ORBITMAP = [('precise','aux_poeorb', 100),
-            ('restituted','aux_resorb', 100)]
+ORBITMAP = [('precise','POEORB', 100),
+            ('restituted','RESORB', 100)]
 
 OPER_RE = re.compile(r'S1\w_OPER_AUX_(?P<type>\w+)_OPOD_(?P<yr>\d{4})(?P<mo>\d{2})(?P<dy>\d{2})')
 
@@ -57,6 +58,8 @@ def cmdLineParse():
     parser.add_argument("--tag", help="PGE docker image tag (release, version, " +
                                       "or branch) to propagate",
                         default="master", required=False)
+    parser.add_argument("--days_back", help="How far back to query for orbits relative to today",
+                        default="1", required=False)
     return parser.parse_args()
 
 
@@ -73,7 +76,7 @@ class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'td':
             self.in_td = True
-        elif tag == 'a' and self.in_td:
+        elif tag == 'a':
             self.in_a = True
         elif tag == 'ul':
             for k,v in attrs:
@@ -83,7 +86,7 @@ class MyHTMLParser(HTMLParser):
             self.pages += 1
 
     def handle_data(self,data):
-        if self.in_td and self.in_a:
+        if self.in_a:
             if OPER_RE.search(data):
                 self.fileList.append(data.strip())
 
@@ -91,7 +94,7 @@ class MyHTMLParser(HTMLParser):
         if tag == 'td':
             self.in_td = False
             self.in_a = False
-        elif tag == 'a' and self.in_td:
+        elif tag == 'a':
             self.in_a = False
         elif tag == 'ul' and self.in_ul:
             self.in_ul = False
@@ -138,57 +141,70 @@ def check_orbit(es_url, es_index, id):
     return total, id
 
 
-def crawl_orbits(dataset_version):
+def crawl_orbits(dataset_version, days_back):
     """Crawl for orbit urls."""
+    date_today = datetime.now()
+    date_delta = timedelta(days = days_back)
+    start_date = date_today - date_delta
 
     results = {}
     session = requests.Session()
     for spec in ORBITMAP:
-        oType = spec[0]
-        url = QC_SERVER + spec[1]
-        page_limit = spec[2]
-        query = url + '/'
+        for x in range(days_back+1):
+            new_delta = timedelta(days = x)
+            new_date = start_date + new_delta
 
-        logger.info(query)
-        
-        logger.info('Querying for {0} orbits'.format(oType))
-        r = session_get(session, query)
-        r.raise_for_status()
-        parser = MyHTMLParser()
-        parser.feed(r.text)
-        logger.info("Found {} pages".format(parser.pages))
+            yyyy = new_date.strftime("%Y")
+            mm = new_date.strftime("%m")
+            dd = new_date.strftime("%d")
 
-        for res in parser.fileList:
-            id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
-            match = OPER_RE.search(res)
-            if not match:
-                raise RuntimeError("Failed to parse orbit: {}".format(res))
-            results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
-            yield id, results[id]
+            date = yyyy + '/' + mm + '/' + dd + '/'
 
-        # page through and get more results
-        page = 2
-        reached_end = False
-        while True:
-            page_query = "{}?page={}".format(query, page)
-            logger.info(page_query)
-            r = session_get(session, page_query)
+            oType = spec[0]
+            url = QC_SERVER + spec[1]
+            page_limit = spec[2]
+            query = url + '/' + date
+
+            logger.info(query)
+            
+            logger.info('Querying for {0} orbits'.format(oType))
+            r = session_get(session, query)
             r.raise_for_status()
-            page_parser = MyHTMLParser()
-            page_parser.feed(r.text)
-            for res in page_parser.fileList:
+            parser = MyHTMLParser()
+            parser.feed(r.text)
+            logger.info("Found {} pages".format(parser.pages))
+
+            for res in parser.fileList:
                 id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
-                if id in results or page >= page_limit:
-                    reached_end = True
-                    break
-                else:
-                    match = OPER_RE.search(res)
-                    if not match:
-                        raise RuntimeError("Failed to parse orbit: {}".format(res))
-                    results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
-                    yield id, results[id]
-            if reached_end: break
-            else: page += 1
+                match = OPER_RE.search(res)
+                if not match:
+                    raise RuntimeError("Failed to parse orbit: {}".format(res))
+                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                yield id, results[id]
+
+            # page through and get more results
+            page = 2
+            reached_end = False
+            while True:
+                page_query = "{}?page={}".format(query, page)
+                logger.info(page_query)
+                r = session_get(session, page_query)
+                r.raise_for_status()
+                page_parser = MyHTMLParser()
+                page_parser.feed(r.text)
+                for res in page_parser.fileList:
+                    id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
+                    if id in results or page >= page_limit:
+                        reached_end = True
+                        break
+                    else:
+                        match = OPER_RE.search(res)
+                        if not match:
+                            raise RuntimeError("Failed to parse orbit: {}".format(res))
+                        results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                        yield id, results[id]
+                if reached_end: break
+                else: page += 1
 
     # close session
     session.close()
@@ -265,10 +281,10 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
     r = requests.post(job_submit_url, params=params, verify=False)
 
 
-def crawl(ds_es_url, dataset_version, tag):
+def crawl(ds_es_url, dataset_version, tag, days_back):
     """Crawl for orbits and submit job if they don't exist in ES."""
 
-    for id, url in crawl_orbits(dataset_version):
+    for id, url in crawl_orbits(dataset_version, days_back):
         #logger.info("%s: %s" % (id, url))
         total, found_id = check_orbit(ds_es_url, "grq_es/grq_v1.1_s1-aux_poeorb", id)
         if total > 0:
@@ -282,7 +298,7 @@ def crawl(ds_es_url, dataset_version, tag):
 
 if __name__ == '__main__':
     inps = cmdLineParse()
-    try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag)
+    try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag, inps.days_back)
     except Exception as e:
         with open('_alt_error.txt', 'w') as f:
             f.write("%s\n" % str(e))
