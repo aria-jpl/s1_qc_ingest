@@ -26,6 +26,14 @@
         "destination": "positional"
     },
     {
+        "name": "days_back_opt",
+        "destination": "positional"
+    },
+    {
+        "name": "days_back",
+        "destination": "positional"
+    },
+    {
         "name": "es_dataset_url",
         "destination": "positional"
     }
