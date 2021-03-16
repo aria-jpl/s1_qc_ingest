@@ -151,7 +151,7 @@ def crawl_orbits(dataset_version, days_back):
     results = {}
     session = requests.Session()
     for spec in ORBITMAP:
-        for x in range(days_back+1):
+        for x in range(days_back):
             new_delta = timedelta(days = x)
             new_date = start_date + new_delta
 
