@@ -131,7 +131,7 @@ def crawl_cals(dataset_version):
     r = session_get(session, query_today)
     if r.status_code != 200:
         logger.info("No calibrations found at this url: {}".format(query))
-        continue
+        return
     #r.raise_for_status()
     parser = MyHTMLParser()
     parser.feed(r.text)
