@@ -37,9 +37,10 @@ logger.setLevel(logging.INFO)
 logger.addFilter(LogFilter())
 
 
-QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
-DATA_SERVER = 'https://qc.sentinel1.eo.esa.int/'
-#DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+#QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+#DATA_SERVER = 'https://qc.sentinel1.eo.esa.int/'
+DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
 
 CAL_RE = re.compile(r'(?P<sat>S1\w)_(?P<type>AUX_CAL)_V(?P<dt>\d{8}T\d{6})')
 
@@ -71,7 +72,7 @@ class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == 'td':
             self.in_td = True
-        elif tag == 'a' and self.in_td:
+        elif tag == 'a':
             self.in_a = True
         elif tag == 'ul':
             for k,v in attrs:
@@ -81,7 +82,7 @@ class MyHTMLParser(HTMLParser):
             self.pages += 1
 
     def handle_data(self,data):
-        if self.in_td and self.in_a:
+        if self.in_a:
             if CAL_RE.search(data):
                 self.fileList.append(data.strip())
 
@@ -89,7 +90,7 @@ class MyHTMLParser(HTMLParser):
         if tag == 'td':
             self.in_td = False
             self.in_a = False
-        elif tag == 'a' and self.in_td:
+        elif tag == 'a':
             self.in_a = False
         elif tag == 'ul' and self.in_ul:
             self.in_ul = False
@@ -109,19 +110,29 @@ def session_get(session, url):
 
 def crawl_cals(dataset_version):
     """Crawl for calibration urls."""
-
+    date_today = datetime.now()
+    yyyy = date_today.strftime("%Y")
+    mm = date_today.strftime("%m")
+    dd = date_today.strftime("%d")
+    date = yyyy + '/' + mm + '/' + dd + '/'
+    
     results = {}
     session = requests.Session()
     oType = 'calibration'
-    url = QC_SERVER + 'aux_cal'
+    url = QC_SERVER + 'AUX_CAL'
     page_limit = 100
-    query = url + '/?adf__active=True'
+    #query = url + '/?adf__active=True'
+    query = url + '/' + date
 
     logger.info(query)
 
     logger.info('Querying for {0} calibration files'.format(oType))
-    r = session_get(session, query)
-    r.raise_for_status()
+
+    r = session_get(session, query_today)
+    if r.status_code != 200:
+        logger.info("No calibrations found at this url: {}".format(query))
+        continue
+    #r.raise_for_status()
     parser = MyHTMLParser()
     parser.feed(r.text)
     logger.info("Found {} pages".format(parser.pages))
