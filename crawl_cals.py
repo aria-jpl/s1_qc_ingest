@@ -16,6 +16,7 @@ except: from html.parser import HTMLParser
 from osaka.main import get, rmall
 
 from create_cal_ds import check_cal, create_cal_ds
+from sdswatch.pgelogger import PGESDSWatchLogger
 
 
 # disable warnings for SSL verification
@@ -26,6 +27,9 @@ requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 # set logger
 log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO)
+
+sdsw_logger = PGESDSWatchLogger(file_dir="/orbit_crawler.sdswatch.log", 
+                           name="orbit_crawler")
 
 class LogFilter(logging.Filter):
     def filter(self, record):
@@ -284,6 +288,8 @@ def crawl(ds_es_url, dataset_version, tag):
 
 
 if __name__ == '__main__':
+    sdsw_logger.log(metric_key="step",
+           metric_value="parsing orbit command line inputs")
     inps = cmdLineParse()
     try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag)
     except Exception as e:
