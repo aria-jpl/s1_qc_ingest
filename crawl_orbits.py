@@ -190,7 +190,7 @@ def crawl_orbits(dataset_version, days_back):
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
                 yield id, results[id]
 
             # page through and get more results
