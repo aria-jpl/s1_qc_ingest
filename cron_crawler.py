@@ -28,12 +28,15 @@ if __name__ == "__main__":
                         default="master", required=False)
     parser.add_argument("--type", help="Sentinel-1 QC file type to crawl",
                         choices=['orbit', 'calibration'], required=True)
+    parser.add_argument("--days_back", help="How far back to query for orbits relative to today",
+                        default="1", required=False)
     args = parser.parse_args()
 
     ds_es_url = args.ds_es_url
     dataset_version = args.dataset_version
     tag = args.tag
     qc_type = args.type
+    days_back = args.days_back
     job_spec = "job-s1_%s_crawler:%s" % (qc_type, tag)
 
     job_name = job_spec
@@ -66,6 +69,16 @@ if __name__ == "__main__":
             "name": "tag",
             "from": "value",
             "value": tag,
+        },
+        {   
+            "name": "days_back_opt",
+            "from": "value",
+            "value": "--days_back",
+        },
+        {   
+            "name": "days_back",
+            "from": "value",
+            "value": days_back,
         },
         {
             "name": "es_dataset_url",

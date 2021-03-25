@@ -22,6 +22,15 @@
         "from": "submitter"
     },
     {
+        "name": "days_back_opt",
+        "from": "value",
+        "value": "--days_back"
+    },
+    {
+        "name": "days_back",
+        "from": "submitter"
+    },
+    {
         "name": "es_dataset_url",
         "from": "submitter"
     }
