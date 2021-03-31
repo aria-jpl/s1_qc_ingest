@@ -27,7 +27,7 @@ requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 # set logger
 log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO)
-sdsw_logger = PGESDSWatchLogger(file_dir="/orbit_sdsw_log", 
+sdsw_logger = PGESDSWatchLogger(file_dir="$HOME/verdi/log/", 
                            name="orbit_crawler")
 
 class LogFilter(logging.Filter):
