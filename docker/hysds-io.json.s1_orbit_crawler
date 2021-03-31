@@ -1,6 +1,6 @@
 {
   "label" : "Sentinel-1 Orbit Crawler",
-  "enable_dedup" : False,
+  "enable_dedup" : false,
   "allowed_accounts": [ "ops" ],
   "submission_type":"individual",
   "params" : [
