@@ -16,6 +16,7 @@ except: from html.parser import HTMLParser
 
 from hysds_commons.job_utils import submit_mozart_job
 from hysds.celery import app
+from sdswatch.pgelogger import PGESDSWatchLogger
 
 
 # disable warnings for SSL verification
@@ -26,6 +27,8 @@ requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 # set logger
 log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO)
+sdsw_logger = PGESDSWatchLogger(file_dir="/orbit_sdsw_log", 
+                           name="orbit_crawler")
 
 class LogFilter(logging.Filter):
     def filter(self, record):
@@ -276,8 +279,7 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
             'priority': '3',
             'tags': tag,
             'type': job_spec,
-            'params': param,
-            'enable_dedup': False
+            'params': param
     }
     logger.info("These are the params")
     logger.info(params)
@@ -301,6 +303,8 @@ def crawl(ds_es_url, dataset_version, tag, days_back):
 
 
 if __name__ == '__main__':
+    sdsw_logger.log(metric_key="step",
+           metric_value="Parsing inputs")
     inps = cmdLineParse()
     try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag, inps.days_back)
     except Exception as e:

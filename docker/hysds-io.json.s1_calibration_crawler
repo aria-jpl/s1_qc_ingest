@@ -1,5 +1,6 @@
 {
   "label" : "Sentinel-1 Auxiliary Calibration Crawler",
+  "enable_dedup" : "false",
   "allowed_accounts": [ "ops" ],
   "submission_type":"individual",
   "params" : [

@@ -91,4 +91,4 @@ if __name__ == "__main__":
         hysdsio={"id": "internal-temporary-wiring",
                  "params": params,
                  "job-specification": job_spec},
-        job_name=job_name, enable_dedup=False)
+        job_name=job_name)
