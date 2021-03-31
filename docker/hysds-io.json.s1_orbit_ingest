@@ -1,6 +1,6 @@
 {
   "label" : "Sentinel-1 Orbit Ingest",
-  "enable_dedup" : "false",
+  "enable_dedup" : "False",
   "allowed_accounts": [ "ops" ],
   "submission_type":"individual",
   "params" : [
