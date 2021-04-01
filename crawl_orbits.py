@@ -27,7 +27,7 @@ requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 # set logger
 log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO)
-sdsw_logger = PGESDSWatchLogger(file_dir="$HOME/verdi/log/", 
+sdsw_logger = PGESDSWatchLogger(file_dir="./", 
                            name="orbit_crawler")
 
 class LogFilter(logging.Filter):
@@ -303,8 +303,7 @@ def crawl(ds_es_url, dataset_version, tag, days_back):
 
 
 if __name__ == '__main__':
-    sdsw_logger.log(metric_key="step",
-           metric_value="Parsing inputs")
+    sdsw_logger.log(step=1, pge=crawl_orbits, test=test)
     inps = cmdLineParse()
     try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag, inps.days_back)
     except Exception as e:
