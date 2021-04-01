@@ -16,7 +16,7 @@ except: from html.parser import HTMLParser
 
 from hysds_commons.job_utils import submit_mozart_job
 from hysds.celery import app
-from sdswatch.pgelogger import PGESDSWatchLogger
+from sdswatch.logger import SDSWatchLogger
 
 
 # disable warnings for SSL verification
@@ -27,15 +27,16 @@ requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 # set logger
 log_format = "[%(asctime)s: %(levelname)s/%(funcName)s] %(message)s"
 logging.basicConfig(format=log_format, level=logging.INFO)
-sdsw_logger = PGESDSWatchLogger(file_dir="./", 
-                           name="orbit_crawler")
+sdsw_logger = SDSWatchLogger(file_dir="./", 
+                        name="orbit_crawler", 
+                        source_type="orbit_scraper", 
+                        source_id="orbit_crawl")
 
 class LogFilter(logging.Filter):
     def filter(self, record):
         if not hasattr(record, 'id'): record.id = '--'
         return True
 
-logger = logging.getLogger('crawl_orbits')
 logger.setLevel(logging.INFO)
 logger.addFilter(LogFilter())
 
