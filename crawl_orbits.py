@@ -174,13 +174,16 @@ def crawl_orbits(dataset_version, days_back):
             oType = spec[0]
             url = QC_SERVER + spec[1]
             page_limit = spec[2]
-            query = url + '/'
+            query = url + '/' + date
 
             logger.info(query)
             
             logger.info('Querying for {0} orbits'.format(oType))
             r = session_get(session, query)
-            r.raise_for_status()
+            if r.status_code != 200:
+                logger.info("No orbits found at this url: {}".format(query))
+                continue
+            #r.raise_for_status()
             parser = MyHTMLParser()
             parser.feed(r.text)
             logger.info("Found {} pages".format(parser.pages))
@@ -190,7 +193,7 @@ def crawl_orbits(dataset_version, days_back):
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
+                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
                 yield id, results[id]
 
             # page through and get more results
