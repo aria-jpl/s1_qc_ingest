@@ -17,7 +17,7 @@ except: from html.parser import HTMLParser
 from hysds_commons.job_utils import submit_mozart_job
 from hysds.celery import app
 from sdswatch.logger import SDSWatchLogger
-
+from bs4 import BeautifulSoup
 
 # disable warnings for SSL verification
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -37,16 +37,18 @@ class LogFilter(logging.Filter):
         if not hasattr(record, 'id'): record.id = '--'
         return True
 
-logger.setLevel(logging.INFO)
-logger.addFilter(LogFilter())
+#logger.setLevel(logging.INFO)
+#logger.addFilter(LogFilter())
 
 
 #QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
-QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
-DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+#QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+#DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+QC_SERVER = 'https://s1qc.asf.alaska.edu/'
+DATA_SERVER = 'https://s1qc.asf.alaska.edu/'
 
-ORBITMAP = [('precise','POEORB', 100),
-            ('restituted','RESORB', 100)]
+ORBITMAP = [('precise','aux_poeorb', 100),
+            ('restituted','aux_resorb', 100)]
 
 OPER_RE = re.compile(r'S1\w_OPER_AUX_(?P<type>\w+)_OPOD_(?P<yr>\d{4})(?P<mo>\d{2})(?P<dy>\d{2})')
 
@@ -151,74 +153,80 @@ def crawl_orbits(dataset_version, days_back):
     date_today = datetime.now()
     date_delta = timedelta(days = days_back)
     start_date = date_today - date_delta
-
+    mission_type = "sat"
+    margin=60.0
+    datefmt="%Y%m%dT%H%M%S"
+    found = False
     results = {}
     session = requests.Session()
     for spec in ORBITMAP:
-        for x in range(days_back):
-            new_delta = timedelta(days = x)
-            new_date = start_date + new_delta
-
-            yyyy = new_date.strftime("%Y")
-            mm = new_date.strftime("%m")
-            dd = new_date.strftime("%d")
-
-            date = yyyy + '/' + mm + '/' + dd + '/'
-
+        #for x in range(days_back):
+            def is_orbit(href):
+                return href and re.compile(r'^S1.*EOF$').search(href)
+            #new_delta = timedelta(days = x)
+            #new_date = start_date + new_delta
             oType = spec[0]
             url = QC_SERVER + spec[1]
             page_limit = spec[2]
-            query = url + '/' + date
+            query = url #+ '/' + date
+            print("The url is: {}".format(query))
+            #logger.info(query)
 
-            logger.info(query)
-            
-            logger.info('Querying for {0} orbits'.format(oType))
+            #logger.info('Querying for {0} orbits'.format(oType))
             r = session_get(session, query)
             if r.status_code != 200:
-                logger.info("No orbits found at this url: {}".format(query))
+                #logger.info("No orbits found at this url: {}".format(query))
                 continue
             #r.raise_for_status()
-            parser = MyHTMLParser()
-            parser.feed(r.text)
-            logger.info("Found {} pages".format(parser.pages))
-
-            for res in parser.fileList:
+            #parser = MyHTMLParser()
+            #parser.feed(r.text)
+            parser = BeautifulSoup(r.text, 'html.parser')
+            print("All found links")
+            print(parser.find_all(href=is_orbit))
+            print(len(parser.find_all(href=is_orbit)))
+            for a in parser.find_all(href=is_orbit):
+                print("All links")
+                print(a['href'])
+                m = re.search(r'^(?P<sat>S1[AB])_.*$', a['href'])
+                sat = m.groupdict()['sat']
+                if mission_type != sat:
+                    orbit = os.path.basename(a['href'])
+                    print("The orbit is: ")
+                    print(orbit)
+                    fields = orbit.split('_')
+                    orbit_start_date_time = datetime.strptime(fields[6].replace('V',''), datefmt) + timedelta(seconds=margin)
+                    orbit_stop_date_time = datetime.strptime(fields[7].replace('.EOF',''), datefmt) - timedelta(seconds=margin)
+                    #results[os.path.splitext(os.path.basename(a['href']))[0]] = f"{url}{a['href']}"
+                    found = True
+                    results[orbit] = f"{url}{a['href']}"
+                    print("Adding new key/val")
+                    print(orbit)
+                    print(f"{url}/{a['href']}")
+                    #break
+                   #if slc_start_dt >= orbit_start_date_time and slc_end_dt < orbit_stop_date_time:
+                    #    results[os.path.splitext(os.path.basename(a['href']))[0]] = f"{url}{a['href']}"
+                    #    found = True
+                    #    break
+                else: print("Not equal to sat")
+            #if found: break
+            #logger.info("Found {} pages".format(parser.pages))
+            print("Length of results")
+            print(len(results))
+            for res in list(results):
                 id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
+                results[id] = DATA_SERVER + "aux_poeorb/" + "{}".format(res)
+                #results[id] = os.path.join("https://s1qc.asf.alaska.edu/", "/", "{}.EOF".format(res))
+                print(results[id])
                 yield id, results[id]
-
-            # page through and get more results
-            page = 2
-            reached_end = False
-            while True:
-                page_query = "{}?page={}".format(query, page)
-                logger.info(page_query)
-                r = session_get(session, page_query)
-                r.raise_for_status()
-                page_parser = MyHTMLParser()
-                page_parser.feed(r.text)
-                for res in page_parser.fileList:
-                    id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
-                    if id in results or page >= page_limit:
-                        reached_end = True
-                        break
-                    else:
-                        match = OPER_RE.search(res)
-                        if not match:
-                            raise RuntimeError("Failed to parse orbit: {}".format(res))
-                        results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
-                        yield id, results[id]
-                if reached_end: break
-                else: page += 1
 
     # close session
     session.close()
 
     #logger.info(json.dumps(results, indent=2, sort_keys=True))
-    logger.info(len(results))
+    #logger.info(len(results))
 
 
 def parse_job_tags(tag_string):
@@ -282,8 +290,8 @@ def submit_job(id, url, ds_es_url, tag, dataset_version):
             'type': job_spec,
             'params': param
     }
-    logger.info("These are the params")
-    logger.info(params)
+    #logger.info("These are the params")
+    #logger.info(params)
     job_submit_url = os.path.join(app.conf['MOZART_URL'], 'api/v0.2/job/submit')
     r = requests.post(job_submit_url, params=params, verify=False)
 
@@ -298,13 +306,13 @@ def crawl(ds_es_url, dataset_version, tag, days_back):
             logger.info("Found %s." % id)
             #prods_found.append(acq_id)
         else:
-            logger.info("Missing %s. Submitting job." % id)
+            #logger.info("Missing %s. Submitting job." % id)
             #prods_missing.append(acq_id)
             submit_job(id, url, ds_es_url, tag, dataset_version)
 
 
 if __name__ == '__main__':
-    sdsw_logger.log(step=1, pge=crawl_orbits, test=test)
+    #sdsw_logger.log(step=1, pge=crawl_orbits, test=test)
     inps = cmdLineParse()
     try: status = crawl(inps.ds_es_url, inps.dataset_version, inps.tag, inps.days_back)
     except Exception as e:
