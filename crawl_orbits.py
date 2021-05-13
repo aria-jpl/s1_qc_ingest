@@ -303,7 +303,8 @@ def crawl(ds_es_url, dataset_version, tag, days_back):
         #logger.info("%s: %s" % (id, url))
         total, found_id = check_orbit(ds_es_url, "grq_es", id)
         if total > 0:
-            logger.info("Found %s." % id)
+            #logger.info("Found %s." % id)
+            print("Found %s." % id)
             #prods_found.append(acq_id)
         else:
             #logger.info("Missing %s. Submitting job." % id)
