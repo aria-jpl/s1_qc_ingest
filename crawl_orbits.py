@@ -157,9 +157,9 @@ def crawl_orbits(dataset_version, days_back):
     margin=60.0
     datefmt="%Y%m%dT%H%M%S"
     found = False
-    results = {}
     session = requests.Session()
     for spec in ORBITMAP:
+            results = {}
         #for x in range(days_back):
             def is_orbit(href):
                 return href and re.compile(r'^S1.*EOF$').search(href)
@@ -217,7 +217,7 @@ def crawl_orbits(dataset_version, days_back):
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = DATA_SERVER + spec[1] + "{}".format(res)
+                results[id] = DATA_SERVER + spec[1] + '/' + "{}".format(res)
                 #results[id] = os.path.join("https://s1qc.asf.alaska.edu/", "/", "{}.EOF".format(res))
                 print(results[id])
                 yield id, results[id]
