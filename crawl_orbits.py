@@ -217,7 +217,7 @@ def crawl_orbits(dataset_version, days_back):
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = DATA_SERVER + "aux_poeorb/" + "{}".format(res)
+                results[id] = DATA_SERVER + spec[1] + "{}".format(res)
                 #results[id] = os.path.join("https://s1qc.asf.alaska.edu/", "/", "{}.EOF".format(res))
                 print(results[id])
                 yield id, results[id]
