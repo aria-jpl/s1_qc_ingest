@@ -16,7 +16,7 @@ except: from html.parser import HTMLParser
 
 from hysds_commons.job_utils import submit_mozart_job
 from hysds.celery import app
-
+from bs4 import BeautifulSoup
 
 # disable warnings for SSL verification
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -120,16 +120,7 @@ def session_get(session, url):
 def check_orbit(es_url, es_index, id):
     """Query for orbits with specified input ID."""
 
-    query = {
-        "query":{
-            "bool":{
-                "must": [
-                    { "term": { "_id": id } },
-                ]
-            }
-        },
-        "fields": [],
-    }
+    query = {"query":{"bool":{"must":[{"term":{"_id":id}}]}}}
 
     if es_url.endswith('/'):
         search_url = '%s%s/_search' % (es_url, es_index)
@@ -157,74 +148,80 @@ def crawl_orbits(dataset_version, days_back):
     date_today = datetime.now()
     date_delta = timedelta(days = days_back)
     start_date = date_today - date_delta
-
-    results = {}
+    mission_type = "sat"
+    margin=60.0
+    datefmt="%Y%m%dT%H%M%S"
+    found = False
     session = requests.Session()
     for spec in ORBITMAP:
-        for x in range(days_back):
-            new_delta = timedelta(days = x)
-            new_date = start_date + new_delta
-
-            yyyy = new_date.strftime("%Y")
-            mm = new_date.strftime("%m")
-            dd = new_date.strftime("%d")
-
-            date = yyyy + '/' + mm + '/' + dd + '/'
-
+            results = {}
+        #for x in range(days_back):
+            def is_orbit(href):
+                return href and re.compile(r'^S1.*EOF$').search(href)
+            #new_delta = timedelta(days = x)
+            #new_date = start_date + new_delta
             oType = spec[0]
             url = QC_SERVER + spec[1]
             page_limit = spec[2]
-            query = url + '/' + date
+            query = url #+ '/' + date
+            print("The url is: {}".format(query))
+            #logger.info(query)
 
-            logger.info(query)
-            
-            logger.info('Querying for {0} orbits'.format(oType))
+            #logger.info('Querying for {0} orbits'.format(oType))
             r = session_get(session, query)
             if r.status_code != 200:
-                logger.info("No orbits found at this url: {}".format(query))
+                #logger.info("No orbits found at this url: {}".format(query))
                 continue
             #r.raise_for_status()
-            parser = MyHTMLParser()
-            parser.feed(r.text)
-            logger.info("Found {} pages".format(parser.pages))
-
-            for res in parser.fileList:
+            #parser = MyHTMLParser()
+            #parser.feed(r.text)
+            parser = BeautifulSoup(r.text, 'html.parser')
+            print("All found links")
+            print(parser.find_all(href=is_orbit))
+            print(len(parser.find_all(href=is_orbit)))
+            for a in parser.find_all(href=is_orbit):
+                print("All links")
+                print(a['href'])
+                m = re.search(r'^(?P<sat>S1[AB])_.*$', a['href'])
+                sat = m.groupdict()['sat']
+                if mission_type != sat:
+                    orbit = os.path.basename(a['href'])
+                    print("The orbit is: ")
+                    print(orbit)
+                    fields = orbit.split('_')
+                    orbit_start_date_time = datetime.strptime(fields[6].replace('V',''), datefmt) + timedelta(seconds=margin)
+                    orbit_stop_date_time = datetime.strptime(fields[7].replace('.EOF',''), datefmt) - timedelta(seconds=margin)
+                    #results[os.path.splitext(os.path.basename(a['href']))[0]] = f"{url}{a['href']}"
+                    found = True
+                    results[orbit] = f"{url}{a['href']}"
+                    print("Adding new key/val")
+                    print(orbit)
+                    print(f"{url}/{a['href']}")
+                    #break
+                   #if slc_start_dt >= orbit_start_date_time and slc_end_dt < orbit_stop_date_time:
+                    #    results[os.path.splitext(os.path.basename(a['href']))[0]] = f"{url}{a['href']}"
+                    #    found = True
+                    #    break
+                else: print("Not equal to sat")
+            #if found: break
+            #logger.info("Found {} pages".format(parser.pages))
+            print("Length of results")
+            print(len(results))
+            for res in list(results):
                 id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
                 match = OPER_RE.search(res)
                 if not match:
                     raise RuntimeError("Failed to parse orbit: {}".format(res))
-                results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}".format(res))
+                results[id] = DATA_SERVER + spec[1] + '/' + "{}".format(res)
+                #results[id] = os.path.join("https://s1qc.asf.alaska.edu/", "/", "{}.EOF".format(res))
+                print(results[id])
                 yield id, results[id]
-
-            # page through and get more results
-            page = 2
-            reached_end = False
-            while True:
-                page_query = "{}?page={}".format(query, page)
-                logger.info(page_query)
-                r = session_get(session, page_query)
-                r.raise_for_status()
-                page_parser = MyHTMLParser()
-                page_parser.feed(r.text)
-                for res in page_parser.fileList:
-                    id = "%s-%s" % (os.path.splitext(res)[0], dataset_version)
-                    if id in results or page >= page_limit:
-                        reached_end = True
-                        break
-                    else:
-                        match = OPER_RE.search(res)
-                        if not match:
-                            raise RuntimeError("Failed to parse orbit: {}".format(res))
-                        results[id] = os.path.join(DATA_SERVER, "/".join(match.groups()), "{}.EOF".format(res))
-                        yield id, results[id]
-                if reached_end: break
-                else: page += 1
 
     # close session
     session.close()
 
     #logger.info(json.dumps(results, indent=2, sort_keys=True))
-    logger.info(len(results))
+    #logger.info(len(results))
 
 
 def submit_job(id, url, ds_es_url, tag, dataset_version):
