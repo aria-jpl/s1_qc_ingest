@@ -40,7 +40,8 @@ logger.addFilter(LogFilter())
 # QC_SERVER = 'https://qc.sentinel1.eo.esa.int/'
 # DATA_SERVER = 'https://qc.sentinel1.eo.esa.int/'
 DATA_SERVER = 'http://aux.sentinel1.eo.esa.int/'
-QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+# QC_SERVER = 'http://aux.sentinel1.eo.esa.int/'
+QC_SERVER = 'https://qc.sentinel1.groupcls.com/'
 
 CAL_RE = re.compile(r'(?P<sat>S1\w)_(?P<type>AUX_CAL)_V(?P<dt>\d{8}T\d{6})')
 
